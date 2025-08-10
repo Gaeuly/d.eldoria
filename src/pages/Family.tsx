@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { FaDiscord, FaCircle, FaCrown } from 'react-icons/fa';
+import { familyMembers } from '../data/familyData';
 
 interface FamilyMember {
   id: string;
@@ -75,20 +76,46 @@ const Family: React.FC = () => {
   ];
 
   useEffect(() => {
-    // Simulate API call
-    const fetchMembers = async () => {
-      setLoading(true);
-      // Simulate delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // Sort by role level (highest first)
-      const sortedMembers = [...dummyMembers].sort((a, b) => b.roleLevel - a.roleLevel);
-      setMembers(sortedMembers);
-      setLoading(false);
-    };
+  const fetchMembers = async () => {
+    setLoading(true);
 
-    fetchMembers();
-  }, []);
+    const updatedMembers = await Promise.all(
+      familyMembers.map(async (member) => {
+        try {
+          const res = await fetch(`https://api.lanyard.rest/v1/users/${member.id}`);
+          const json = await res.json();
+
+          if (json.success) {
+            return {
+              ...member,
+              username: json.data.discord_user.username,
+              avatar: json.data.discord_user.avatar
+                ? `https://cdn.discordapp.com/avatars/${member.id}/${json.data.discord_user.avatar}.png?size=128`
+                : '',
+              status: json.data.discord_status || 'offline',
+            };
+          }
+        } catch {
+          // fallback kalau error fetch
+        }
+        return {
+          ...member,
+          username: 'Unknown',
+          avatar: '',
+          status: 'offline',
+        };
+      })
+    );
+
+    // Sort by roleLevel descending
+    updatedMembers.sort((a, b) => b.roleLevel - a.roleLevel);
+
+    setMembers(updatedMembers);
+    setLoading(false);
+  };
+
+  fetchMembers();
+}, []);
 
   const getStatusColor = (status: string) => {
     switch (status) {
