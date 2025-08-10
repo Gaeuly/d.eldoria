@@ -200,53 +200,53 @@ const Navbar = () => {
             
             <div className="px-4 py-6 space-y-2 relative">
               {navItems.map((item, index) => {
-                const Icon = item.icon;
-                const isActive = currentPath === item.path;
-                
-                return (
-                  <div
-                    key={item.path}
-                    onClick={() => handleNavClick(item.path)}
-                    className={`group relative flex items-center space-x-3 px-4 py-3 text-base font-medium transition-all duration-300 hover:scale-105 cursor-pointer ${
-                      isActive
-                        ? 'text-yellow-400 bg-yellow-400/10'
-                        : 'text-gray-300 hover:text-yellow-400 hover:bg-yellow-400/5'
-                    }`}
-                    style={{
-                      animationDelay: `${index * 0.1}s`,
-                      opacity: isOpen ? 1 : 0,
-                      transform: isOpen ? 'translateX(0)' : 'translateX(-20px)',
-                      transition: `all 0.3s ease-out ${index * 0.1}s`
-                    }}
-                  >
-                    {/* Background Glow */}
-                    <div className="absolute inset-0 bg-gradient-to-r from-yellow-400/5 via-amber-400/5 to-yellow-600/5 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                    
-                    {/* Left Border Indicator */}
-                    <div className={`absolute left-0 top-1/2 transform -translate-y-1/2 w-1 bg-gradient-to-b from-yellow-400 to-amber-500 transition-all duration-300 ${
-                      isActive ? 'h-8' : 'h-0 group-hover:h-4'
-                    }`}></div>
-                    
-                    {/* Content */}
-                    <div className="relative flex items-center space-x-3">
-                      <Icon className={`w-5 h-5 transition-all duration-300 ${
-                        isActive ? 'text-yellow-400' : 'text-gray-400 group-hover:text-yellow-400'
-                      }`} />
-                      <span className="relative">
-                        {item.name}
-                      </span>
-                    </div>
-                    
-                    {/* Corner Decorations for Active */}
-                    {isActive && (
-                      <>
-                        <div className="absolute top-1 right-2 w-2 h-2 border-r border-t border-yellow-400/40"></div>
-                        <div className="absolute bottom-1 right-2 w-2 h-2 border-r border-b border-yellow-400/40"></div>
-                      </>
-                    )}
-                  </Link>
-                );
-              })}
+  const Icon = item.icon;
+  const isActive = currentPath === item.path;
+
+  return (
+    <div
+      key={item.path}
+      onClick={() => handleNavClick(item.path)}
+      className={`group relative flex items-center space-x-3 px-4 py-3 text-base font-medium transition-all duration-300 hover:scale-105 cursor-pointer ${
+        isActive
+          ? 'text-yellow-400 bg-yellow-400/10'
+          : 'text-gray-300 hover:text-yellow-400 hover:bg-yellow-400/5'
+      }`}
+      style={{
+        animationDelay: `${index * 0.1}s`,
+        opacity: isOpen ? 1 : 0,
+        transform: isOpen ? 'translateX(0)' : 'translateX(-20px)',
+        transition: `all 0.3s ease-out ${index * 0.1}s`
+      }}
+    >
+      {/* Background Glow */}
+      <div className="absolute inset-0 bg-gradient-to-r from-yellow-400/5 via-amber-400/5 to-yellow-600/5 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+
+      {/* Left Border Indicator */}
+      <div className={`absolute left-0 top-1/2 transform -translate-y-1/2 w-1 bg-gradient-to-b from-yellow-400 to-amber-500 transition-all duration-300 ${
+        isActive ? 'h-8' : 'h-0 group-hover:h-4'
+      }`}></div>
+
+      {/* Content */}
+      <div className="relative flex items-center space-x-3">
+        <Icon className={`w-5 h-5 transition-all duration-300 ${
+          isActive ? 'text-yellow-400' : 'text-gray-400 group-hover:text-yellow-400'
+        }`} />
+        <span className="relative">
+          {item.name}
+        </span>
+      </div>
+
+      {/* Corner Decorations for Active */}
+      {isActive && (
+        <>
+          <div className="absolute top-1 right-2 w-2 h-2 border-r border-t border-yellow-400/40"></div>
+          <div className="absolute bottom-1 right-2 w-2 h-2 border-r border-b border-yellow-400/40"></div>
+        </>
+      )}
+    </div>
+  );
+})}
             </div>
             
             {/* Bottom Border */}
