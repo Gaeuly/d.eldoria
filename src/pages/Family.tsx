@@ -11,6 +11,7 @@ interface FamilyMember {
   bio: string;
   role: string;
   roleLevel: number;
+  avatarDecoration?: string;
 }
 
 const Family: React.FC = () => {
@@ -93,6 +94,7 @@ const Family: React.FC = () => {
                 ? `https://cdn.discordapp.com/avatars/${member.id}/${json.data.discord_user.avatar}.png?size=128`
                 : '',
               status: json.data.discord_status || 'offline',
+              avatarDecoration: `/decorations/${discordUser.id}.png`,
             };
           }
         } catch {
@@ -197,6 +199,14 @@ const Family: React.FC = () => {
                     alt={member.username}
                     className="w-16 h-16 object-cover border-2 border-eldoria-gold/50 group-hover:border-eldoria-gold transition-all duration-300"
                   />
+                  {/* Avatar Decoration overlay */}
+  {member.avatarDecoration && (
+    <img
+      src={member.avatarDecoration}
+      alt="decoration"
+      className="absolute top-0 left-0 w-16 h-16 pointer-events-none"
+    />
+  )}
                   <FaCircle className={`absolute -bottom-1 -right-1 text-sm ${getStatusColor(member.status)}`} />
                 </div>
                 <div className="ml-4 flex-1">
