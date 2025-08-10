@@ -106,7 +106,11 @@ const Home = () => {
         <div className="text-center max-w-6xl mx-auto">
           {/* Crown Symbol */}
           <div className="mb-8 relative">
-            <Crown className="w-16 h-16 mx-auto text-yellow-400 mb-4 animate-pulse drop-shadow-lg" />
+            <img
+  src="/assets/crown.png"
+  alt="Crown"
+  className="w-16 h-16 mx-auto mb-4 animate-pulse drop-shadow-lg"
+/>
             <div className="absolute -top-2 -right-2 w-4 h-4">
               <Sparkles className="w-full h-full text-yellow-300 animate-spin drop-shadow-sm" style={{animationDuration: '3s'}} />
             </div>
