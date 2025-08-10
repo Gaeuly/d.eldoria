@@ -154,7 +154,7 @@ const Footer = () => {
               © 2025 <span className="text-yellow-400 font-semibold">D. Eldoria Family</span>. All rights reserved.
             </p>
             <p className="text-xs text-gray-500 mt-1">
-              Established in 2020 • Built with honor and pride
+              Established in 2020 • Built with gaeuly and D.Eldoria
             </p>
           </div>
 
