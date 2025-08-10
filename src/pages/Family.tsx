@@ -1,10 +1,24 @@
 import React, { useState, useEffect } from 'react';
 import { Crown, Shield, Users, Star, Sparkles, Circle } from 'lucide-react';
+import { familyMembers } from '../data/familyData';
+
+interface FamilyMember {
+  id: string;
+  username: string;
+  avatar: string;
+  status: 'online' | 'offline' | 'idle' | 'dnd';
+  bio: string;
+  role: string;
+  roleLevel: number;
+  avatarDecoration?: string;
+  joinDate?: string;
+  achievements?: string[];
+}
 
 const Family = () => {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const [scrollY, setScrollY] = useState(0);
-  const [members, setMembers] = useState([]);
+  const [members, setMembers] = useState<FamilyMember[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -96,11 +110,46 @@ const Family = () => {
   ];
 
   useEffect(() => {
-    // Simulate loading
-    setTimeout(() => {
-      setMembers(dummyMembers.sort((a, b) => b.roleLevel - a.roleLevel));
+    const fetchMembers = async () => {
+      setLoading(true);
+
+      const updatedMembers = await Promise.all(
+        familyMembers.map(async (member) => {
+          try {
+            const res = await fetch(`https://api.lanyard.rest/v1/users/${member.id}`);
+            const json = await res.json();
+
+            if (json.success) {
+              return {
+                ...member,
+                username: json.data.discord_user.username,
+                avatar: json.data.discord_user.avatar
+                  ? `https://cdn.discordapp.com/avatars/${member.id}/${json.data.discord_user.avatar}.png?size=128`
+                  : 'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?w=200&h=200&fit=crop&crop=face',
+                status: json.data.discord_status || 'offline',
+                avatarDecoration: `/decorations/${member.id}.png`
+              };
+            }
+          } catch {
+            // fallback kalau error fetch
+          }
+          return {
+            ...member,
+            username: member.username || 'Unknown',
+            avatar: member.avatar || 'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?w=200&h=200&fit=crop&crop=face',
+            status: 'offline',
+          };
+        })
+      );
+
+      // Sort by roleLevel descending
+      updatedMembers.sort((a, b) => b.roleLevel - a.roleLevel);
+
+      setMembers(updatedMembers);
       setLoading(false);
-    }, 1500);
+    };
+
+    fetchMembers();
   }, []);
 
   const getStatusColor = (status) => {
@@ -286,6 +335,15 @@ const Family = () => {
                         />
                       </div>
                       
+                      {/* Avatar Decoration overlay */}
+                      {member.avatarDecoration && (
+                        <img
+                          src={member.avatarDecoration}
+                          alt="decoration"
+                          className="absolute top-0 left-0 w-16 h-16 pointer-events-none"
+                        />
+                      )}
+                      
                       {/* Status Indicator */}
                       <div className={`absolute -bottom-1 -right-1 w-5 h-5 ${getStatusDot(member.status)} rounded-full border-2 border-black shadow-lg animate-pulse`}></div>
                       
@@ -315,18 +373,20 @@ const Family = () => {
                   </div>
 
                   {/* Achievements */}
-                  <div className="mb-4">
-                    <div className="flex flex-wrap gap-1">
-                      {member.achievements.map((achievement, i) => (
-                        <span 
-                          key={i}
-                          className="text-xs px-2 py-1 bg-yellow-400/20 text-yellow-300 rounded border border-yellow-400/30 group-hover:bg-yellow-400/30 transition-all duration-300"
-                        >
-                          {achievement}
-                        </span>
-                      ))}
+                  {member.achievements && member.achievements.length > 0 && (
+                    <div className="mb-4">
+                      <div className="flex flex-wrap gap-1">
+                        {member.achievements.map((achievement, i) => (
+                          <span 
+                            key={i}
+                            className="text-xs px-2 py-1 bg-yellow-400/20 text-yellow-300 rounded border border-yellow-400/30 group-hover:bg-yellow-400/30 transition-all duration-300"
+                          >
+                            {achievement}
+                          </span>
+                        ))}
+                      </div>
                     </div>
-                  </div>
+                  )}
 
                   {/* Footer */}
                   <div className="flex items-center justify-between pt-3 border-t border-yellow-400/20 group-hover:border-yellow-400/40 transition-all duration-300">
@@ -337,7 +397,7 @@ const Family = () => {
                       </span>
                     </div>
                     <div className="text-xs text-yellow-400/80 font-medium">
-                      Since {member.joinDate}
+                      {member.joinDate ? `Since ${member.joinDate}` : 'New Member'}
                     </div>
                   </div>
                 </div>
@@ -371,6 +431,12 @@ const Family = () => {
                 </div>
               </div>
               <div className="absolute bottom-0 right-0 w-full h-1 bg-gradient-to-r from-transparent via-yellow-400/50 to-transparent"></div>
+              
+              <div className="mt-4 text-center">
+                <p className="text-xs text-gray-400">
+                  Status real-time melalui Lanyard Discord API
+                </p>
+              </div>
             </div>
           </div>
         </div>
