@@ -94,7 +94,7 @@ const Family: React.FC = () => {
                 ? `https://cdn.discordapp.com/avatars/${member.id}/${json.data.discord_user.avatar}.png?size=128`
                 : '',
               status: json.data.discord_status || 'offline',
-              avatarDecoration: `/decorations/${discordUser.id}.png`,
+              avatarDecoration: `/decorations/${member.id}.png`
             };
           }
         } catch {
