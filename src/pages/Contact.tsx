@@ -11,13 +11,16 @@ interface ContactPerson {
   description: string;
   status: 'online' | 'offline' | 'idle' | 'dnd';
   specialty: string[];
-  discordId?: string;
+  discordId: string;
   availability: string;
+  avatarDecoration?: string;
 }
 
 const Contact = () => {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const [scrollY, setScrollY] = useState(0);
+  const [contacts, setContacts] = useState<ContactPerson[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const handleMouseMove = (e) => {
@@ -31,62 +34,120 @@ const Contact = () => {
     window.addEventListener('mousemove', handleMouseMove);
     window.addEventListener('scroll', handleScroll);
     
-    return () => {
+    const handleContactClick = (contact) => {
+    // Copy Discord username to clipboard
+    navigator.clipboard.writeText(contact.username).then(() => {
+      console.log(`Copied ${contact.name}'s Discord username: ${contact.username}`);
+      // You can add a toast notification here
+    }).catch(err => {
+      console.error('Failed to copy username:', err);
+    });
+  };
+
+  return () => {
       window.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('scroll', handleScroll);
     };
   }, []);
 
-  const contacts: ContactPerson[] = [
+  // Contact data with Discord IDs for Lanyard API
+  const contactsData: ContactPerson[] = [
     {
-      id: '1',
+      id: '500293365494054932', // Replace with actual Discord ID
+      discordId: '123456789012345678',
       name: 'Duke Alexander',
       role: 'Duke',
       roleLevel: 5,
       username: 'duke.alexander#0001',
       avatar: 'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?w=200&h=200&fit=crop&crop=face',
       description: 'Hubungi untuk masalah penting, kemitraan strategis, dan keputusan tingkat tinggi keluarga Eldoria.',
-      status: 'online',
+      status: 'offline',
       specialty: ['Strategic Decisions', 'Partnerships', 'Leadership'],
       availability: '24/7 Emergency',
     },
     {
-      id: '2',
+      id: '234567890123456789', // Replace with actual Discord ID
+      discordId: '234567890123456789',
       name: 'Duchess Victoria',
       role: 'Duchess',
       roleLevel: 4,
       username: 'duchess.victoria#0002',
       avatar: 'https://images.pexels.com/photos/415829/pexels-photo-415829.jpeg?w=200&h=200&fit=crop&crop=face',
       description: 'Koordinasi diplomasi, hubungan eksternal, dan manajemen acara besar keluarga.',
-      status: 'idle',
+      status: 'offline',
       specialty: ['Diplomacy', 'External Relations', 'Events'],
       availability: 'Weekdays 9AM-6PM',
     },
     {
-      id: '3',
+      id: '345678901234567890', // Replace with actual Discord ID
+      discordId: '345678901234567890',
       name: 'Elder Marcus',
       role: 'Elder',
       roleLevel: 3,
       username: 'elder.marcus#0003',
       avatar: 'https://images.pexels.com/photos/1681010/pexels-photo-1681010.jpeg?w=200&h=200&fit=crop&crop=face',
       description: 'Konsultasi masalah keluarga, mediasi konflik, panduan untuk anggota baru, dan penjaga tradisi.',
-      status: 'online',
+      status: 'offline',
       specialty: ['Family Counseling', 'Conflict Resolution', 'Traditions'],
       availability: 'Daily 2PM-10PM',
     },
     {
-      id: '4',
+      id: '456789012345678901', // Replace with actual Discord ID
+      discordId: '456789012345678901',
       name: 'Knight Isabella',
       role: 'Knight',
       roleLevel: 2,
       username: 'knight.isabella#0004',
       avatar: 'https://images.pexels.com/photos/733872/pexels-photo-733872.jpeg?w=200&h=200&fit=crop&crop=face',
       description: 'Manajemen komunitas harian, koordinasi aktivitas, dan dukungan operasional anggota.',
-      status: 'online',
+      status: 'offline',
       specialty: ['Community Management', 'Daily Operations', 'Member Support'],
       availability: 'Daily 6PM-12AM',
     },
   ];
+
+  useEffect(() => {
+    const fetchContacts = async () => {
+      setLoading(true);
+
+      const updatedContacts = await Promise.all(
+        contactsData.map(async (contact) => {
+          try {
+            const res = await fetch(`https://api.lanyard.rest/v1/users/${contact.discordId}`);
+            const json = await res.json();
+
+            if (json.success) {
+              return {
+                ...contact,
+                username: json.data.discord_user.username + '#' + json.data.discord_user.discriminator,
+                avatar: json.data.discord_user.avatar
+                  ? `https://cdn.discordapp.com/avatars/${contact.discordId}/${json.data.discord_user.avatar}.png?size=128`
+                  : contact.avatar,
+                status: json.data.discord_status || 'offline',
+                avatarDecoration: `/decorations/${contact.discordId}.png`
+              };
+            }
+          } catch (error) {
+            console.log(`Failed to fetch data for ${contact.name}:`, error);
+          }
+          return {
+            ...contact,
+            username: contact.username || 'Unknown',
+            avatar: contact.avatar,
+            status: 'offline',
+          };
+        })
+      );
+
+      // Sort by roleLevel descending
+      updatedContacts.sort((a, b) => b.roleLevel - a.roleLevel);
+
+      setContacts(updatedContacts);
+      setLoading(false);
+    };
+
+    fetchContacts();
+  }, []);
 
   const getStatusColor = (status) => {
     switch (status) {
@@ -127,11 +188,36 @@ const Contact = () => {
     }
   };
 
-  const handleContactClick = (contact) => {
-    // Simulate Discord contact action
-    console.log(`Contacting ${contact.name} on Discord: ${contact.username}`);
-    // You can add actual Discord contact logic here
-  };
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-black text-white flex items-center justify-center relative overflow-hidden">
+        {/* Background */}
+        <div className="absolute inset-0 bg-gradient-to-br from-gray-900 via-black to-gray-800">
+          {[...Array(30)].map((_, i) => (
+            <div
+              key={i}
+              className="absolute w-1 h-1 bg-yellow-400 rounded-full opacity-20 animate-pulse"
+              style={{
+                left: `${Math.random() * 100}%`,
+                top: `${Math.random() * 100}%`,
+                animationDelay: `${Math.random() * 3}s`,
+                animationDuration: `${2 + Math.random() * 2}s`
+              }}
+            />
+          ))}
+        </div>
+        
+        <div className="text-center relative z-10">
+          <div className="relative mb-6">
+            <MessageSquare className="w-16 h-16 mx-auto text-yellow-400 animate-pulse drop-shadow-lg" />
+            <div className="absolute inset-0 w-16 h-16 mx-auto bg-yellow-400 rounded-full blur-xl opacity-30 animate-pulse"></div>
+          </div>
+          <div className="w-20 h-20 border-4 border-yellow-400/30 border-t-yellow-400 rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-yellow-400 text-xl font-semibold">Loading Contact Information...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-black text-white overflow-hidden relative">
@@ -277,6 +363,18 @@ const Contact = () => {
                         />
                       </div>
                       
+                      {/* Avatar Decoration overlay */}
+                      {contact.avatarDecoration && (
+                        <img
+                          src={contact.avatarDecoration}
+                          alt="decoration"
+                          className="absolute top-0 left-0 w-16 h-16 pointer-events-none"
+                          onError={(e) => {
+                            e.currentTarget.style.display = 'none';
+                          }}
+                        />
+                      )}
+                      
                       {/* Status Indicator */}
                       <div className={`absolute -bottom-1 -right-1 w-5 h-5 ${getStatusDot(contact.status)} rounded-full border-2 border-black shadow-lg animate-pulse`}></div>
                       
@@ -357,7 +455,35 @@ const Contact = () => {
             ))}
           </div>
 
-          {/* Discord Server Section */}
+          {/* Contact Stats */}
+          <div className="mt-12 text-center">
+            <div className="bg-gradient-to-r from-black/90 via-yellow-900/20 to-black/90 backdrop-blur-xl border border-yellow-400/40 p-6 max-w-2xl mx-auto relative overflow-hidden">
+              <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-yellow-400 to-transparent"></div>
+              <div className="flex justify-center items-center gap-8">
+                <div className="text-center">
+                  <div className="text-3xl font-bold text-yellow-400 mb-1">{contacts.length}</div>
+                  <div className="text-sm text-gray-300">Contact Points</div>
+                </div>
+                <div className="w-px h-12 bg-yellow-400/30"></div>
+                <div className="text-center">
+                  <div className="text-3xl font-bold text-yellow-400 mb-1">{contacts.filter(c => c.status === 'online').length}</div>
+                  <div className="text-sm text-gray-300">Available Now</div>
+                </div>
+                <div className="w-px h-12 bg-yellow-400/30"></div>
+                <div className="text-center">
+                  <div className="text-3xl font-bold text-yellow-400 mb-1">24/7</div>
+                  <div className="text-sm text-gray-300">Response Time</div>
+                </div>
+              </div>
+              <div className="absolute bottom-0 right-0 w-full h-1 bg-gradient-to-r from-transparent via-yellow-400/50 to-transparent"></div>
+              
+              <div className="mt-4 text-center">
+                <p className="text-xs text-gray-400">
+                  Status real-time melalui Lanyard Discord API
+                </p>
+              </div>
+            </div>
+          </div>
           <div className="mt-12">
             <div className="bg-gradient-to-r from-black/90 via-yellow-900/20 to-black/90 backdrop-blur-xl border border-yellow-400/40 p-8 relative overflow-hidden">
               <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-yellow-400 to-transparent"></div>
