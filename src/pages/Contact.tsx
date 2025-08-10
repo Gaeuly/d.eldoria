@@ -54,7 +54,7 @@ const Contact = () => {
   const contactsData: ContactPerson[] = [
     {
       id: '500293365494054932', // Replace with actual Discord ID
-      discordId: '123456789012345678',
+      discordId: '500293365494054932',
       name: 'Duke Alexander',
       role: 'Duke',
       roleLevel: 5,
