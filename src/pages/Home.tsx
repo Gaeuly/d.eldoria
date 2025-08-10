@@ -109,7 +109,7 @@ const Home = () => {
             <img
   src="/assets/crown.png"
   alt="Crown"
-  className="w-12 h-12 md:w-16 md:h-16 mx-auto mb-4 animate-pulse drop-shadow-lg"
+  className="w-16 h-16 md:w-20 md:h-20 mx-auto mb-4 animate-pulse drop-shadow-lg max-w-full"
 />
             <div className="absolute -top-2 -right-2 w-4 h-4">
               <Sparkles className="w-full h-full text-yellow-300 animate-spin drop-shadow-sm" style={{animationDuration: '3s'}} />
