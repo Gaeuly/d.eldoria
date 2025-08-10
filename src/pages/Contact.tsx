@@ -55,7 +55,7 @@ const Contact = () => {
     {
       id: '500293365494054932', // Replace with actual Discord ID
       discordId: '500293365494054932',
-      name: 'Duke Alexander',
+      name: 'gaeuly',
       role: 'Duke',
       roleLevel: 5,
       username: 'duke.alexander#0001',
