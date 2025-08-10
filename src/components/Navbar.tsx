@@ -80,7 +80,11 @@ const Navbar = () => {
             {/* Logo */}
             <Link to="/" className="flex items-center space-x-3 group relative cursor-pointer" onClick={() => setIsOpen(false)}>
               <div className="relative">
-                <Crown className="text-yellow-400 text-2xl group-hover:scale-110 transition-all duration-300 drop-shadow-lg" />
+                <img
+  src="/assets/crown.png"
+  alt="Crown"
+  className="w-6 h-6 md:w-8 md:h-8 group-hover:scale-110 transition-all duration-300 drop-shadow-lg"
+/>
                 <div className="absolute inset-0 bg-yellow-400 blur-lg opacity-0 group-hover:opacity-30 transition-opacity duration-300"></div>
                 <div className="absolute -top-1 -right-1 w-2 h-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                   <Sparkles className="w-full h-full text-yellow-300 animate-spin" style={{ animationDuration: '3s' }} />
