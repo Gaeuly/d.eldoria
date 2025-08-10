@@ -9,8 +9,8 @@ export interface FamilyMemberData {
 
 export const familyMembers: FamilyMemberData[] = [
   {
-    id: '123456789012345678',  // Ganti ini dengan Discord User ID asli
-    role: 'Duke',
+    id: '500293365494054932',  // Ganti ini dengan Discord User ID asli
+    role: 'Kaisar',
     roleLevel: 5,
     bio: 'Penguasa tertinggi keluarga Eldoria',
   },
