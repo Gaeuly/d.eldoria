@@ -38,4 +38,10 @@ export const familyMembers: FamilyMemberData[] = [
     roleLevel: 1,
     bio: 'Anggota baru yang penuh semangat',
   },
+  {
+    id: '567890123456789012',
+    role: 'Members',
+    roleLevel: 1,
+    bio: 'Anggota baru yang penuh semangat',
+  },
 ];
